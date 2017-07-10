@@ -18,6 +18,8 @@ rawlist = rawstr.split('\n')
 
 ptree = portage.db[portage.root]["porttree"].dbapi
 
+logfile = open('/var/log/mirrorlog.log', 'w')
+
 for ebuild in rawlist:
     fineebuild = ebuild.replace("/usr/portage/", "").replace(".ebuild", "")
     fineebuild = re.sub(r'/.*/', '/',  fineebuild)
@@ -26,13 +28,15 @@ for ebuild in rawlist:
         restrict = ptree.aux_get(fineebuild, ["RESTRICT"])
     except:
         pass
-    if( 'mirror' in restrict[0] ):
-        print("m:", restrict)
+    if( 'mirror' in restrict[0] or 'fetch' in restrict[0]):
+        pass
     else:
         try:
             fetchstatus = subprocess.check_output( \
             ["ebuild", ebuild, "fetch"], \
             universal_newlines=True)
-            print(fetchstatus)
+            logfile.write(fineebuild)
         except subprocess.CalledProcessError:
-            print("Could not fetch %s", fineebuild)
+            print("Fetch error: Could not fetch " + fineebuild)
+
+logfile.close()

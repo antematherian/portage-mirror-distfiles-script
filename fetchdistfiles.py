@@ -3,9 +3,15 @@
 import subprocess
 import portage
 import re
+import sys
+
+if sys.argc < 3:
+    print("This script requires two arguments. Run it like this:")
+    print("./fetchdistfiles.py /usr/portage 10")
+    print("To download the whole portage tree with 10 processes spawned at a time")
 try:
     rawstr = subprocess.check_output( \
-    "find /usr/portage -type f \( -iname '*.ebuild' ! -iname 'skel.ebuild' \)" , \
+    "find {} -type f \( -iname '*.ebuild' ! -iname 'skel.ebuild' \)".format(sys.argv[1]) , \
     universal_newlines=True, shell=True)
 except subprocess.CalledProcessError:
     print("Could not fetch the packagelist using equery --quiet list '*'. Aborting")
@@ -42,3 +48,9 @@ try:
 except subprocess.CalledProcessError:
     print(fetchstatus)
 
+try:
+    fetchstatus = subprocess.check_output(\
+        "nice -n 10 sh -c 'cat fetchlist.sh | parallel -P{}'".format(sys.argv[2]), \
+        universal_newlines=True, shell=True)
+except subprocess.CalledProcessError:
+    print(fetchstatus)

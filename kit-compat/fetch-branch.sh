@@ -7,7 +7,7 @@ function fetch_branch {
 	local logfile="/var/www/ceresia.ch/arczero/fetchlog/\$$branch/\$$time.log"
 	find $1 -type f \( -iname '*.ebuild' ! -iname 'skel.ebuild' \) | \
 	sed s'/\//ebuild \//' | sed s'/\.ebuild/\.ebuild fetch/' | parallel -P${2} \
-	2> logfile
+	&> logfile
 }
 fetch_branch "/var/git/core-kit" "3"
 

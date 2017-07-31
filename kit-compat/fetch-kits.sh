@@ -12,11 +12,13 @@ function fetch_repo {
 	all_branches=( $( git branch -a | sed '/HEAD/d' | sed '/\*/d' | sed s'/..remotes\/origin\///' ) )
 	for i in "${all_branches[@]}"; do 
 		git checkout $i
+		git pull
 		fetch_branch $1 $2; done;
 	git checkout $current_branch
 }
 repolist=( $(./repolist.py | sed s'/ /\n/'g | sed s'/)//' | \
-sed s'/(//' | sed s'/u//' | sed s'/,//' | sed '/.*overlay*/d' ))
+sed s'/(//' | sed s'/u//' | sed s'/,//' | sed '/.*overlay*/d' | \
+sed 's/'\''//g' ))
 
 for j in "${repolist[@]}"; do
 	fetch_repo $j "3";
